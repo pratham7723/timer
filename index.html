@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackathon Timer - 6 Hour Test</title>
+    <style>
+        body {
+            background-color: #454141;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding-top: 100px;
+        }
+
+        .timer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2c2c2c;
+            border-radius: 50%;
+            width: 400px;
+            height: 400px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+            transition: box-shadow 1s ease-in-out;
+        }
+
+        .glow {
+            animation: glowEffect 1s infinite alternate;
+        }
+
+        @keyframes glowEffect {
+            from {
+                box-shadow: 0 0 20px #4caf50, 0 0 40px #4caf50, 0 0 60px #4caf50;
+            }
+            to {
+                box-shadow: 0 0 30px #f44336, 0 0 50px #f44336, 0 0 70px #f44336;
+            }
+        }
+
+        .timer {
+            font-size: 72px;
+            font-weight: bold;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        button {
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+            font-size: 20px;
+            padding: 10px 30px;
+            margin: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #3b3b3b;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        #startBtn {
+            background-color: #4caf50;
+            color: #ffffff;
+        }
+
+        #startBtn:hover {
+            background-color: #45a049;
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+        }
+
+        .logos {
+            display: flex;
+            justify-content: center;
+            position: fixed;
+            top: 20px;
+            width: 100%;
+        }
+
+        /* Individual logo classes for separate styling */
+        .logo1 {
+            width: 150px;  /* Adjust logo 1 width */
+            height: 150px; /* Adjust logo 1 height */
+            margin: 0 30px;
+        }
+
+        .logo2 {
+            width: 405px;  /* Adjust logo 2 width */
+            height: 80px; /* Adjust logo 2 height */
+            margin: 0 30px;
+        }
+
+        .logo3 {
+            width: 250px;  /* Adjust logo 3 width */
+            height: 60px;  /* Adjust logo 3 height */
+            margin: 0 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo Section -->
+    <div class="logos">
+        <img src="logo1.png" alt="Logo 1" class="logo1">
+        <img src="logo2.png" alt="Logo 2" class="logo2">
+        <img src="logo3.png" alt="Logo 3" class="logo3">
+    </div>
+
+    <div id="timerContainer" class="timer-container">
+        <div id="time" class="timer">06:00:00</div>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn">Let's code a greener future!</button>
+
+        <div class="button-row">
+            <button id="pauseBtn">Pause</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+    </div>
+
+    <!-- Audio Element -->
+    <audio id="completionSound" src="1.mp3" preload="auto"></audio>
+
+    <script>
+        let countdownInterval;
+        let countdownTime = 6 * 60 * 60; // 6 hours in seconds
+        let isPaused = true;
+        const timerContainer = document.getElementById('timerContainer');
+        const completionSound = document.getElementById('completionSound');
+
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        document.getElementById('time').textContent = formatTime(countdownTime);
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            if (isPaused) {
+                isPaused = false;
+                timerContainer.classList.add('glow');
+                countdownInterval = setInterval(() => {
+                    if (countdownTime > 0) {
+                        countdownTime--;
+                        document.getElementById('time').textContent = formatTime(countdownTime);
+                        updateGlowEffect(countdownTime);
+                    } else {
+                        clearInterval(countdownInterval);
+                        timerContainer.classList.remove('glow');
+                        completionSound.play(); // Play sound on completion
+                    }
+                }, 1000);
+            }
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            clearInterval(countdownInterval);
+            isPaused = true;
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            clearInterval(countdownInterval);
+            countdownTime = 6 * 60 * 60; // Reset to 6 hours
+            document.getElementById('time').textContent = formatTime(countdownTime);
+            isPaused = true;
+            timerContainer.classList.remove('glow');
+        });
+
+        function updateGlowEffect(remainingTime) {
+            const percentage = (remainingTime / (6 * 60 * 60)); // 6 hours
+            const intensity = Math.max(20, 50 * (1 - percentage));
+
+            timerContainer.style.boxShadow = `
+                0 0 ${intensity}px #f44336,
+                0 0 ${intensity + 20}px #f44336,
+                0 0 ${intensity + 40}px #f44336
+            `;
+        }
+    </script>
+</body>
+</html>
